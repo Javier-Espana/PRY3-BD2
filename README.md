@@ -8,6 +8,7 @@ Proyecto de rompecabezas con Neo4j: carga de rompecabezas desde formato TXT esta
 - `puzzles/`: archivos TXT de rompecabezas.
 - `formato_rompecabezas.txt`: especificacion del formato.
 - `main.py`: punto de entrada unico de la aplicacion.
+- `PENDIENTES_E_INSTRUCCIONES_EQUIPO.md`: checklist de entrega y guia para el equipo.
 
 ## Configuracion
 
