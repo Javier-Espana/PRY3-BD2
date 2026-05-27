@@ -1,0 +1,129 @@
+from __future__ import annotations
+
+from collections import deque
+from dataclasses import dataclass
+
+from .db import PuzzleRepository
+
+
+@dataclass(frozen=True)
+class SolveResult:
+    instructions: list[str]
+    order: list[str]
+    missing: list[str]
+    unreachable: list[str]
+
+
+def _format_step(
+    step: int,
+    origin_label: str,
+    origin_conn: int,
+    origin_type: str,
+    target_label: str,
+    target_conn: int,
+    target_type: str,
+) -> str:
+    return (
+        f"Paso {step:>3}: Toma la pieza {target_label} y conecta su conexion {target_conn} "
+        f"({target_type}) con la conexion {origin_conn} ({origin_type}) de la pieza {origin_label}."
+    )
+
+
+def _format_missing_step(
+    step: int,
+    origin_label: str,
+    origin_conn: int,
+    origin_type: str,
+    missing_label: str,
+    missing_conn: int,
+) -> str:
+    return (
+        f"Paso {step:>3}: [PIEZA FALTANTE] La pieza {missing_label} (conexion {missing_conn}) "
+        f"deberia conectarse a la conexion {origin_conn} ({origin_type}) de la pieza {origin_label}, "
+        "pero no esta disponible."
+    )
+
+
+def solve_puzzle(
+    repo: PuzzleRepository,
+    puzzle_id: str,
+    start_piece: str,
+    user_missing_pieces: set[str] | None = None,
+) -> SolveResult:
+    user_missing_pieces = user_missing_pieces or set()
+
+    pieces = repo.list_pieces(puzzle_id)
+    if not pieces:
+        raise ValueError("No hay piezas registradas para ese rompecabezas.")
+
+    all_labels = [p["label"] for p in pieces]
+    base_availability = {p["label"]: bool(p["disponible"]) for p in pieces}
+
+    if start_piece not in base_availability:
+        raise ValueError(f"La pieza inicial '{start_piece}' no existe en el rompecabezas.")
+
+    effective_missing = {label for label, ok in base_availability.items() if not ok}
+    effective_missing.update(user_missing_pieces)
+
+    if start_piece in effective_missing:
+        raise ValueError(
+            f"La pieza inicial '{start_piece}' esta marcada como faltante. Elige otra pieza."
+        )
+
+    queue = deque([start_piece])
+    visited = {start_piece}
+    order = [start_piece]
+    missing_found: list[str] = []
+    missing_set = set()
+    instructions: list[str] = []
+    step = 1
+
+    while queue:
+        current = queue.popleft()
+        neighbors = repo.get_neighbors(puzzle_id, current)
+
+        for n in neighbors:
+            label = n["vecino_label"]
+            if label in visited or label in missing_set:
+                continue
+
+            if label in effective_missing:
+                instructions.append(
+                    _format_missing_step(
+                        step,
+                        current,
+                        int(n["conex_origen"]),
+                        str(n["tipo_origen"]),
+                        label,
+                        int(n["conex_vecino"]),
+                    )
+                )
+                missing_set.add(label)
+                missing_found.append(label)
+                step += 1
+                continue
+
+            instructions.append(
+                _format_step(
+                    step,
+                    current,
+                    int(n["conex_origen"]),
+                    str(n["tipo_origen"]),
+                    label,
+                    int(n["conex_vecino"]),
+                    str(n["tipo_vecino"]),
+                )
+            )
+            visited.add(label)
+            queue.append(label)
+            order.append(label)
+            step += 1
+
+    unresolved = sorted(set(all_labels) - set(order) - set(missing_found))
+
+    return SolveResult(
+        instructions=instructions,
+        order=order,
+        missing=missing_found,
+        unreachable=unresolved,
+    )

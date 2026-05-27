@@ -1,0 +1,50 @@
+# Formato estandar para importar rompecabezas a Neo4j (Aura o local)
+#
+# Reglas:
+# 1) El archivo debe tener secciones [PUZZLE], [PIEZAS], [CONEXIONES], [ENLACES]
+# 2) Separador de campos: |
+# 3) Tipos de conexion permitidos: MACHO, HEMBRA
+# 4) Cada enlace debe conectar MACHO <-> HEMBRA
+#
+# Campos obligatorios en [PUZZLE]:
+# - puzzle_id
+# - nombre
+#
+# Campos opcionales en [PUZZLE]:
+# - marca
+# - material
+# - tematica
+# - total_piezas (si no se define, se calcula con cantidad de piezas)
+
+[PUZZLE]
+puzzle_id=basico_00
+nombre=Rompecabezas_Basico_00
+marca=Ejemplo
+material=Carton
+tematica=Demo
+total_piezas=4
+
+[PIEZAS]
+# label
+00
+01
+02
+03
+
+[CONEXIONES]
+# pieza_label|numero_conexion|tipo
+00|0|MACHO
+00|1|HEMBRA
+01|0|MACHO
+01|1|HEMBRA
+02|0|HEMBRA
+02|1|MACHO
+03|0|HEMBRA
+03|1|MACHO
+
+[ENLACES]
+# pieza_a|conexion_a|pieza_b|conexion_b
+00|0|03|0
+00|1|01|0
+01|1|02|1
+02|0|03|1
