@@ -26,6 +26,20 @@ NEO4J_PASSWORD=<password>
 
 ## Instalación y ejecución
 
+Si todavía no tienes creado el entorno virtual, ejecútalo una vez:
+
+```bash
+python3 -m venv .venv
+```
+
+Activa el entorno virtual en Linux:
+
+```bash
+source .venv/bin/activate
+```
+
+Luego instala las dependencias y ejecuta el proyecto:
+
 ```bash
 pip install -r requirements.txt
 python main.py

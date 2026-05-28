@@ -15,6 +15,27 @@ class SolveResult:
     unreachable: list[str]
 
 
+def _connection_description(tipo: str) -> str:
+    tipo_normalizado = tipo.upper()
+    if tipo_normalizado == "MACHO":
+        return "MACHO (saliente)"
+    if tipo_normalizado == "HEMBRA":
+        return "HEMBRA (receptora)"
+    return tipo
+
+
+def _general_instructions() -> list[str]:
+    return [
+        "Instrucciones generales de armado:",
+        "1. Cada pieza se identifica por el numero visible en su anverso.",
+        "2. El anverso es la cara donde se lee el numero de la pieza y el numero de cada conexion.",
+        "3. Coloca la pieza inicial en posicion correcta, derecha y sin invertirla, de forma que los numeros se lean normalmente.",
+        "4. El reverso es la cara opuesta; durante el armado trabaja siempre con el anverso visible.",
+        "5. Cada conexion se describe por su numero y su tipo: MACHO (saliente) o HEMBRA (receptora).",
+        "6. En cada paso, une una conexion MACHO con una conexion HEMBRA compatibles segun la instruccion indicada.",
+    ]
+
+
 def _format_step(
     step: int,
     origin_label: str,
@@ -25,8 +46,11 @@ def _format_step(
     target_type: str,
 ) -> str:
     return (
-        f"Paso {step:>3}: Toma la pieza {target_label} y conecta su conexion {target_conn} "
-        f"({target_type}) con la conexion {origin_conn} ({origin_type}) de la pieza {origin_label}."
+        f"Paso {step:>3}:\n"
+        f"  Toma la pieza {target_label} y orienta su anverso hacia ti.\n"
+        f"  Conecta su conexion {target_conn} ({_connection_description(target_type)})\n"
+        f"  con la conexion {origin_conn} ({_connection_description(origin_type)})\n"
+        f"  de la pieza {origin_label}."
     )
 
 
@@ -37,18 +61,23 @@ def _format_missing_step(
     origin_type: str,
     missing_label: str,
     missing_conn: int,
+    missing_type: str,
 ) -> str:
     return (
-        f"Paso {step:>3}: [PIEZA FALTANTE] La pieza {missing_label} (conexion {missing_conn}) "
-        f"deberia conectarse a la conexion {origin_conn} ({origin_type}) de la pieza {origin_label}, "
-        "pero no esta disponible."
+        f"Paso {step:>3}: [PIEZA FALTANTE]\n"
+        f"  La pieza {missing_label}, con la conexion {missing_conn} "
+        f"({_connection_description(missing_type)}),\n"
+        f"  deberia conectarse a la conexion {origin_conn} "
+        f"({_connection_description(origin_type)}) de la pieza {origin_label},\n"
+        "  pero no esta disponible."
     )
 
 
 def _format_component_jump(step: int, next_start: str) -> str:
     return (
-        f"Paso {step:>3}: Se agotaron las conexiones del mini-rompecabezas actual. "
-        f"Salta a la pieza {next_start} para continuar con otro grupo disponible."
+        f"Paso {step:>3}:\n"
+        "  Se agotaron las conexiones del mini-rompecabezas actual.\n"
+        f"  Salta a la pieza {next_start} para continuar con otro grupo disponible."
     )
 
 
@@ -82,7 +111,8 @@ def solve_puzzle(
     order = [start_piece]
     missing_found: list[str] = []
     missing_set = set()
-    instructions: list[str] = []
+    instructions: list[str] = _general_instructions()
+    instructions.append("")
     step = 1
 
     queue = deque([start_piece])
@@ -105,6 +135,7 @@ def solve_puzzle(
                         str(n["tipo_origen"]),
                         label,
                         int(n["conex_vecino"]),
+                        str(n["tipo_vecino"]),
                     )
                 )
                 missing_set.add(label)

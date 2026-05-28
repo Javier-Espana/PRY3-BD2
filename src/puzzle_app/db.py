@@ -171,7 +171,7 @@ class PuzzleRepository:
                 )
 
             for c in puzzle.conexiones:
-                conn_id = f"{puzzle.puzzle_id}:{c.piece_label}:{c.numero}"
+                conn_id = f"{c.piece_label}:{c.numero}"
                 s.run(
                     """
                     MATCH (pi:Pieza {piece_id: $piece_id})
@@ -193,8 +193,8 @@ class PuzzleRepository:
                 )
 
             for e in puzzle.enlaces:
-                id_a = f"{puzzle.puzzle_id}:{e.piece_a}:{e.conn_a}"
-                id_b = f"{puzzle.puzzle_id}:{e.piece_b}:{e.conn_b}"
+                id_a = f"{e.piece_a}:{e.conn_a}"
+                id_b = f"{e.piece_b}:{e.conn_b}"
                 s.run(
                     """
                     MATCH (a:Conex {id: $id_a})
