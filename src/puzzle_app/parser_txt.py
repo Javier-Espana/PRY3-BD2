@@ -95,6 +95,12 @@ def parse_puzzle_txt(file_path: str | Path) -> PuzzleDef:
             f"Faltan campos obligatorios en [PUZZLE]: {', '.join(missing_required)}"
         )
 
+    empty_required = [k for k in required if not puzzle_fields[k].strip()]
+    if empty_required:
+        raise PuzzleFormatError(
+            f"Los campos obligatorios en [PUZZLE] no pueden estar vacios: {', '.join(empty_required)}"
+        )
+
     if not piezas:
         raise PuzzleFormatError("Debe definir al menos una pieza en [PIEZAS].")
 
@@ -134,7 +140,16 @@ def parse_puzzle_txt(file_path: str | Path) -> PuzzleDef:
                 "debe conectar MACHO con HEMBRA."
             )
 
-    total_piezas = int(puzzle_fields.get("total_piezas", len(piezas)))
+    total_piezas_raw = puzzle_fields.get("total_piezas")
+    if total_piezas_raw is None or not total_piezas_raw.strip():
+        total_piezas = len(piezas)
+    else:
+        try:
+            total_piezas = int(total_piezas_raw)
+        except ValueError as exc:
+            raise PuzzleFormatError(
+                f"total_piezas invalido en [PUZZLE]: '{total_piezas_raw}'"
+            ) from exc
 
     return PuzzleDef(
         puzzle_id=puzzle_fields["puzzle_id"],
