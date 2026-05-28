@@ -1,0 +1,217 @@
+\documentclass[11pt,a4paper]{article}
+
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage[spanish]{babel}
+\usepackage{lmodern}
+\usepackage{geometry}
+\usepackage{graphicx}
+\usepackage{float}
+\usepackage{subcaption}
+\usepackage{xcolor}
+\usepackage{hyperref}
+\usepackage{enumitem}
+\usepackage{booktabs}
+\usepackage{array}
+\usepackage{longtable}
+\usepackage{setspace}
+\usepackage{titlesec}
+
+\geometry{margin=2.5cm}
+\setstretch{1.08}
+\hypersetup{
+    colorlinks=true,
+    linkcolor=blue!60!black,
+    urlcolor=blue!60!black,
+    citecolor=blue!60!black,
+    pdftitle={Proyecto 03 - Elección de tecnologías de base de datos},
+    pdfauthor={Roberto Barreda et al.}
+}
+
+\titleformat{\section}{\Large\bfseries}{\thesection.}{0.6em}{}
+\titleformat{\subsection}{\large\bfseries}{\thesubsection.}{0.6em}{}
+
+\graphicspath{{docs/images/}{docs/images/Database/}{docs/images/Process/}{docs/images/Logo/}}
+
+\newcommand{\imagefit}[2]{%
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=#1\linewidth,keepaspectratio]{\detokenize{#2}}
+\end{figure}
+}
+
+\begin{document}
+
+\begin{titlepage}
+    \centering
+    \vspace*{1cm}
+    {\large Universidad del Valle de Guatemala\par}
+    {\large Facultad de Ingeniería\par}
+    {\large Departamento de Ciencias de la Computación\par}
+    \vspace{1.5cm}
+
+    \includegraphics[width=0.42\linewidth]{\detokenize{docs/images/Logo/Logo.jpg}}\par
+    \vspace{1cm}
+
+    {\LARGE\bfseries Proyecto 03\par}
+    \vspace{0.2cm}
+    {\LARGE\bfseries Elección de tecnologías de base de datos\par}
+    \vspace{1cm}
+
+    {\large CC3089 - Base de Datos 2\par}
+    {\large Semestre I 2026\par}
+    \vspace{1.2cm}
+
+    {\large Roberto Barreda, 23354\par}
+    {\large Javier España, 23361\par}
+    {\large Diego López, 23747\par}
+    {\large Ángel Esquit, 23221\par}
+    {\large Mia Fuentes, 23775\par}
+    {\large Anggelie Velásquez, 221181\par}
+    \vfill
+    {\large Guatemala, 28 de mayo de 2026\par}
+\end{titlepage}
+
+\tableofcontents
+\newpage
+
+\section{Introducción}
+Este proyecto aborda la representación y resolución de rompecabezas físicos mediante una base de datos de grafos. La idea central es modelar cada rompecabezas como un conjunto de piezas con conexiones numeradas, de modo que el programa pueda consultar relaciones entre piezas y generar instrucciones de armado a partir de una pieza inicial.
+
+La solución está pensada para ser escalable: permite importar diferentes rompecabezas, registrar piezas faltantes, persistir ese estado y reutilizar el mismo modelo para topologías distintas, como cadenas lineales, cuadrículas o estructuras irregulares.
+
+\section{Objetivo}
+El objetivo es seleccionar una tecnología de base de datos adecuada, justificar la decisión y construir una solución funcional que:
+\begin{itemize}[leftmargin=1.2cm]
+    \item almacene la información de los rompecabezas y sus piezas;
+    \item represente las relaciones físicas entre conexiones;
+    \item permita importar archivos de texto con el formato del proyecto;
+    \item resuelva el rompecabezas partiendo de una pieza inicial;
+    \item indique qué hacer cuando existen piezas faltantes.
+\end{itemize}
+
+\section{Tecnología elegida}
+Se eligió Neo4j como base de datos principal. La razón es que el problema se modela naturalmente como un grafo: cada pieza es un nodo y cada unión entre conexiones es una relación. Este enfoque reduce la complejidad de consultar vecinos y recorrer la estructura del rompecabezas.
+
+Entre las ventajas más importantes están:
+\begin{itemize}[leftmargin=1.2cm]
+    \item consultas directas sobre vecinos de una pieza;
+    \item facilidad para representar topologías distintas sin alterar el esquema;
+    \item persistencia simple del estado de disponibilidad de las piezas;
+    \item buena correspondencia con el algoritmo de recorrido por anchura usado en la solución.
+\end{itemize}
+
+\section{Modelo de datos}
+El modelo implementado organiza la información en tres niveles principales:
+
+\begin{itemize}[leftmargin=1.2cm]
+    \item \textbf{Puzzle}: almacena información general del rompecabezas, como identificador, nombre, marca, material, temática y total de piezas.
+    \item \textbf{Pieza}: representa cada pieza individual y guarda un campo \texttt{disponible} para indicar si la pieza está presente o faltante.
+    \item \textbf{Conex}: representa cada punto de unión físico de una pieza, con número y tipo (\textit{MACHO} o \textit{HEMBRA}).
+\end{itemize}
+
+Las relaciones principales son:
+\begin{itemize}[leftmargin=1.2cm]
+    \item \texttt{(Puzzle)-[:TIENE]->(Pieza)} para agrupar piezas por rompecabezas;
+    \item \texttt{(Pieza)-[:TIENE\_CONEXION]->(Conex)} para registrar las conexiones de cada pieza;
+    \item \texttt{(Conex)-[:ENLAZA]->(Conex)} para modelar la unión física entre dos conexiones compatibles.
+\end{itemize}
+
+\subsection{Capturas del grafo en Neo4j}
+Las siguientes imágenes muestran el grafo resultante en Neo4j para distintos rompecabezas y estados de carga.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.94\linewidth]{\detokenize{docs/images/Database/Plesiosaur — armado completo desde pieza 1.png}}
+    \caption{Grafo del rompecabezas Plesiosaur completamente armado desde la pieza inicial.}
+\end{figure}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.94\linewidth]{\detokenize{docs/images/Database/Plesiosaur — armado parcial, pieza 2 faltante.png}}
+    \caption{Grafo del rompecabezas Plesiosaur con una pieza faltante registrada en la base de datos.}
+\end{figure}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.94\linewidth]{\detokenize{docs/images/Database/Aviones armado completo desde R1C1.png}}
+    \caption{Grafo del rompecabezas Aviones resuelto completamente desde la pieza R1C1.}
+\end{figure}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.94\linewidth]{\detokenize{docs/images/Database/Aviones — armado parcial con 3 piezas faltantes.jpg}}
+    \caption{Grafo del rompecabezas Aviones en estado parcial, con tres piezas faltantes.}
+\end{figure}
+
+\section{Importación de archivos}
+Los rompecabezas se cargan desde archivos de texto con secciones definidas para el rompecabezas, piezas, conexiones y enlaces. Durante la importación, el parser valida la estructura, la existencia de campos obligatorios y la consistencia de conexiones y enlaces.
+
+Además de evitar errores de formato, esta validación protege la base de datos de datos inconsistentes. Si un archivo contiene piezas duplicadas, conexiones inexistentes o un enlace entre dos conexiones del mismo tipo, la importación se detiene con un error explicativo.
+
+\subsection{Formato esperado}
+El archivo debe contener, al menos:
+\begin{itemize}[leftmargin=1.2cm]
+    \item \texttt{[PUZZLE]} con \texttt{puzzle\_id} y \texttt{nombre};
+    \item \texttt{[PIEZAS]} con una lista de labels;
+    \item \texttt{[CONEXIONES]} con \texttt{pieza|numero|tipo};
+    \item \texttt{[ENLACES]} con \texttt{piezaA|conexionA|piezaB|conexionB}.
+\end{itemize}
+
+\section{Algoritmo de resolución}
+La solución usa un recorrido por anchura (BFS) sobre el grafo de piezas y conexiones. A partir de una pieza inicial, el programa consulta sus vecinos y va generando instrucciones de armado. Si una pieza vecina está marcada como faltante, el algoritmo no la usa para continuar el recorrido, pero sí la reporta como pieza ausente.
+
+El comportamiento más importante es que, cuando se termina un grupo conectado de piezas disponibles, el algoritmo no se detiene. En su lugar, el programa salta a otra pieza disponible no visitada y continúa el recorrido. Esto permite resolver varios mini-rompecabezas independientes dentro del mismo tablero lógico, que es precisamente el caso que puede ocurrir cuando las piezas faltantes rompen la conectividad.
+
+\subsection{Salida esperada}
+El resultado final incluye:
+\begin{itemize}[leftmargin=1.2cm]
+    \item instrucciones paso a paso;
+    \item orden de armado;
+    \item piezas faltantes detectadas;
+    \item piezas no alcanzadas desde los componentes procesados.
+\end{itemize}
+
+\subsection{Evidencia del armado}
+Las fotos del armado físico muestran la correspondencia entre el modelo lógico y el rompecabezas real.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.75\linewidth]{\detokenize{docs/images/Process/Picture from above.jpeg}}
+    \caption{Vista superior del armado físico del rompecabezas Plesiosaur.}
+\end{figure}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.75\linewidth]{\detokenize{docs/images/Process/Scenic Picture.jpeg}}
+    \caption{Vista lateral del armado físico del rompecabezas de aviones.}
+\end{figure}
+
+\section{Ejemplos de resultados}
+En la práctica, el sistema permite resolver diferentes rompecabezas con estructuras distintas. En las capturas del grafo se observa cómo la solución se adapta a cada topología, manteniendo el mismo esquema de almacenamiento.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.72\linewidth]{\detokenize{docs/images/Process/Puzzle 1.jpeg}}
+    \caption{Rompecabezas Plesiosaur resuelto físicamente.}
+\end{figure}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.72\linewidth]{\detokenize{docs/images/Process/Puzzle 2.jpeg}}
+    \caption{Rompecabezas de aviones resuelto físicamente.}
+\end{figure}
+
+\section{Conclusiones}
+Neo4j resultó una opción adecuada para este proyecto porque el problema está dominado por relaciones entre piezas y no por operaciones tabulares tradicionales. La solución permite importar, persistir, consultar y resolver rompecabezas de forma consistente.
+
+Además, el manejo de piezas faltantes no solo reporta la ausencia, sino que conserva la capacidad de resolver todo lo que sí está conectado. Esto mejora la utilidad práctica del sistema y se alinea con la observación explícita de la consigna.
+
+\section{Referencias}
+\begin{itemize}[leftmargin=1.2cm]
+    \item Consigna del Proyecto 03 - Elección de tecnologías de base de datos.
+    \item Neo4j Aura: \url{https://neo4j.com/cloud/aura/}.
+    \item Documentación del proyecto y archivos fuente incluidos en el repositorio.
+\end{itemize}
+
+\end{document}
