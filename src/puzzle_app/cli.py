@@ -151,10 +151,7 @@ def _run_solver(repo: PuzzleRepository) -> None:
     print(f"Orden de armado: {' -> '.join(result.order)}")
 
     if result.unreachable:
-        print(
-            "Piezas no alcanzadas desde la pieza inicial: "
-            f"{', '.join(result.unreachable)}"
-        )
+        print(f"Piezas no resueltas: {', '.join(result.unreachable)}")
     print("=" * 68)
 
 

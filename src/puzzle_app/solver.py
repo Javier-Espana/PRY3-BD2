@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from collections import deque
 from dataclasses import dataclass
+import random
 
 from .db import PuzzleRepository
 
@@ -44,6 +45,13 @@ def _format_missing_step(
     )
 
 
+def _format_component_jump(step: int, next_start: str) -> str:
+    return (
+        f"Paso {step:>3}: Se agotaron las conexiones del mini-rompecabezas actual. "
+        f"Salta a la pieza {next_start} para continuar con otro grupo disponible."
+    )
+
+
 def solve_puzzle(
     repo: PuzzleRepository,
     puzzle_id: str,
@@ -70,13 +78,14 @@ def solve_puzzle(
             f"La pieza inicial '{start_piece}' esta marcada como faltante. Elige otra pieza."
         )
 
-    queue = deque([start_piece])
     visited = {start_piece}
     order = [start_piece]
     missing_found: list[str] = []
     missing_set = set()
     instructions: list[str] = []
     step = 1
+
+    queue = deque([start_piece])
 
     while queue:
         current = queue.popleft()
@@ -118,6 +127,24 @@ def solve_puzzle(
             queue.append(label)
             order.append(label)
             step += 1
+
+        if queue:
+            continue
+
+        remaining_available = [
+            label
+            for label in all_labels
+            if label not in visited and label not in effective_missing
+        ]
+        if not remaining_available:
+            break
+
+        next_start = random.choice(sorted(remaining_available))
+        instructions.append(_format_component_jump(step, next_start))
+        step += 1
+        visited.add(next_start)
+        order.append(next_start)
+        queue.append(next_start)
 
     unresolved = sorted(set(all_labels) - set(order) - set(missing_found))
 
