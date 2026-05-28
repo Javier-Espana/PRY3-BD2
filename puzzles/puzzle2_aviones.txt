@@ -1,0 +1,169 @@
+[PUZZLE]
+puzzle_id=puzzle2_aviones
+nombre=Aviones
+marca=Desconocida
+material=Carton
+tematica=Aviacion
+total_piezas=24
+
+[PIEZAS]
+# Grilla 4 filas x 6 columnas = 24 piezas
+# Nomenclatura: R{fila}C{columna}
+R1C1
+R1C2
+R1C3
+R1C4
+R1C5
+R1C6
+R2C1
+R2C2
+R2C3
+R2C4
+R2C5
+R2C6
+R3C1
+R3C2
+R3C3
+R3C4
+R3C5
+R3C6
+R4C1
+R4C2
+R4C3
+R4C4
+R4C5
+R4C6
+
+[CONEXIONES]
+# Conexiones por pieza
+# 0=arriba(HEMBRA), 1=derecha(MACHO), 2=abajo(MACHO), 3=izquierda(HEMBRA)
+# Esquina superior-izquierda (sin arriba, sin izquierda)
+R1C1|1|MACHO
+R1C1|2|MACHO
+# Borde superior (sin arriba)
+R1C2|1|MACHO
+R1C2|2|MACHO
+R1C2|3|HEMBRA
+R1C3|1|MACHO
+R1C3|2|MACHO
+R1C3|3|HEMBRA
+R1C4|1|MACHO
+R1C4|2|MACHO
+R1C4|3|HEMBRA
+R1C5|1|MACHO
+R1C5|2|MACHO
+R1C5|3|HEMBRA
+# Esquina superior-derecha (sin arriba, sin derecha)
+R1C6|2|MACHO
+R1C6|3|HEMBRA
+# Borde izquierdo (sin izquierda)
+R2C1|0|HEMBRA
+R2C1|1|MACHO
+R2C1|2|MACHO
+# Interior fila 2
+R2C2|0|HEMBRA
+R2C2|1|MACHO
+R2C2|2|MACHO
+R2C2|3|HEMBRA
+R2C3|0|HEMBRA
+R2C3|1|MACHO
+R2C3|2|MACHO
+R2C3|3|HEMBRA
+R2C4|0|HEMBRA
+R2C4|1|MACHO
+R2C4|2|MACHO
+R2C4|3|HEMBRA
+R2C5|0|HEMBRA
+R2C5|1|MACHO
+R2C5|2|MACHO
+R2C5|3|HEMBRA
+# Borde derecho (sin derecha) fila 2
+R2C6|0|HEMBRA
+R2C6|2|MACHO
+R2C6|3|HEMBRA
+# Borde izquierdo (sin izquierda) fila 3
+R3C1|0|HEMBRA
+R3C1|1|MACHO
+R3C1|2|MACHO
+# Interior fila 3
+R3C2|0|HEMBRA
+R3C2|1|MACHO
+R3C2|2|MACHO
+R3C2|3|HEMBRA
+R3C3|0|HEMBRA
+R3C3|1|MACHO
+R3C3|2|MACHO
+R3C3|3|HEMBRA
+R3C4|0|HEMBRA
+R3C4|1|MACHO
+R3C4|2|MACHO
+R3C4|3|HEMBRA
+R3C5|0|HEMBRA
+R3C5|1|MACHO
+R3C5|2|MACHO
+R3C5|3|HEMBRA
+# Borde derecho (sin derecha) fila 3
+R3C6|0|HEMBRA
+R3C6|2|MACHO
+R3C6|3|HEMBRA
+# Esquina inferior-izquierda (sin abajo, sin izquierda)
+R4C1|0|HEMBRA
+R4C1|1|MACHO
+# Borde inferior (sin abajo)
+R4C2|0|HEMBRA
+R4C2|1|MACHO
+R4C2|3|HEMBRA
+R4C3|0|HEMBRA
+R4C3|1|MACHO
+R4C3|3|HEMBRA
+R4C4|0|HEMBRA
+R4C4|1|MACHO
+R4C4|3|HEMBRA
+R4C5|0|HEMBRA
+R4C5|1|MACHO
+R4C5|3|HEMBRA
+# Esquina inferior-derecha (sin abajo, sin derecha)
+R4C6|0|HEMBRA
+R4C6|3|HEMBRA
+
+[ENLACES]
+# Conexiones horizontales: pieza izquierda(MACHO) -> pieza derecha(HEMBRA)
+R1C1|1|R1C2|3
+R1C2|1|R1C3|3
+R1C3|1|R1C4|3
+R1C4|1|R1C5|3
+R1C5|1|R1C6|3
+R2C1|1|R2C2|3
+R2C2|1|R2C3|3
+R2C3|1|R2C4|3
+R2C4|1|R2C5|3
+R2C5|1|R2C6|3
+R3C1|1|R3C2|3
+R3C2|1|R3C3|3
+R3C3|1|R3C4|3
+R3C4|1|R3C5|3
+R3C5|1|R3C6|3
+R4C1|1|R4C2|3
+R4C2|1|R4C3|3
+R4C3|1|R4C4|3
+R4C4|1|R4C5|3
+R4C5|1|R4C6|3
+# Conexiones verticales: pieza arriba(MACHO) -> pieza abajo(HEMBRA)
+R1C1|2|R2C1|0
+R1C2|2|R2C2|0
+R1C3|2|R2C3|0
+R1C4|2|R2C4|0
+R1C5|2|R2C5|0
+R1C6|2|R2C6|0
+R2C1|2|R3C1|0
+R2C2|2|R3C2|0
+R2C3|2|R3C3|0
+R2C4|2|R3C4|0
+R2C5|2|R3C5|0
+R2C6|2|R3C6|0
+R3C1|2|R4C1|0
+R3C2|2|R4C2|0
+R3C3|2|R4C3|0
+R3C4|2|R4C4|0
+R3C5|2|R4C5|0
+R3C6|2|R4C6|0

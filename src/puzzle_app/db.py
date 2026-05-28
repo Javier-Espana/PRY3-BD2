@@ -11,7 +11,10 @@ from .models import PuzzleDef
 
 def build_connection_settings() -> tuple[str, str, str]:
     uri = os.getenv("NEO4J_URI", "bolt://localhost:7687")
-    user = os.getenv("NEO4J_USER", "neo4j")
+    # neo4j+s:// fails on Windows Store Python (no system CA access); ssc skips cert verification
+    if uri.startswith("neo4j+s://"):
+        uri = "neo4j+ssc://" + uri[len("neo4j+s://"):]
+    user = os.getenv("NEO4J_USERNAME") or os.getenv("NEO4J_USER", "neo4j")
     password = os.getenv("NEO4J_PASSWORD", "tu_password")
     return uri, user, password
 
@@ -91,6 +94,21 @@ class PuzzleRepository:
                 r.data()
                 for r in s.run(query, piece_id=f"{puzzle_id}:{piece_label}")
             ]
+
+    def mark_piece_missing(self, puzzle_id: str, piece_label: str) -> None:
+        with self.session() as s:
+            s.run(
+                "MATCH (pi:Pieza {piece_id: $piece_id}) SET pi.disponible = false",
+                piece_id=f"{puzzle_id}:{piece_label}",
+            )
+
+    def reset_all_pieces(self, puzzle_id: str) -> None:
+        with self.session() as s:
+            s.run(
+                "MATCH (:Puzzle {puzzle_id: $puzzle_id})-[:TIENE]->(pi:Pieza) "
+                "SET pi.disponible = true",
+                puzzle_id=puzzle_id,
+            )
 
     def upsert_puzzle(self, puzzle: PuzzleDef) -> None:
         self.ensure_schema()

@@ -102,7 +102,7 @@ def _run_solver(repo: PuzzleRepository) -> None:
 
     print("\nPiezas del rompecabezas:")
     for p in pieces:
-        status = "disponible" if p["disponible"] else "faltante_en_bd"
+        status = "disponible" if p["disponible"] else "FALTANTE (registrada en BD)"
         print(f"  - {p['label']} ({status})")
 
     while True:
@@ -116,6 +116,11 @@ def _run_solver(repo: PuzzleRepository) -> None:
         break
 
     missing = _read_missing_pieces(set(piece_map.keys()), start_piece)
+
+    if missing:
+        for label in missing:
+            repo.mark_piece_missing(puzzle_id, label)
+        print(f"[BD] Piezas registradas como faltantes en Neo4j: {', '.join(sorted(missing))}")
 
     try:
         result = solve_puzzle(repo, puzzle_id, start_piece, missing)
@@ -141,7 +146,7 @@ def _run_solver(repo: PuzzleRepository) -> None:
         print("Estado: armado parcial (hay piezas faltantes).")
         print(f"Piezas faltantes detectadas: {', '.join(result.missing)}")
     else:
-        print("Estado: armado sin faltantes declaradas.")
+        print("Estado: armado completo.")
 
     print(f"Orden de armado: {' -> '.join(result.order)}")
 
@@ -153,6 +158,22 @@ def _run_solver(repo: PuzzleRepository) -> None:
     print("=" * 68)
 
 
+def _run_reset(repo: PuzzleRepository) -> None:
+    puzzle_id = _choose_puzzle(repo)
+    if not puzzle_id:
+        return
+
+    confirm = _read_non_empty(
+        f"Esto marcara TODAS las piezas de '{puzzle_id}' como disponibles. Confirmar? (s/n): "
+    ).lower()
+    if confirm not in {"s", "si", "y", "yes"}:
+        print("Operacion cancelada.")
+        return
+
+    repo.reset_all_pieces(puzzle_id)
+    print(f"[OK] Todas las piezas de '{puzzle_id}' restauradas a disponible en Neo4j.")
+
+
 def run_cli() -> None:
     uri, user, password = build_connection_settings()
     repo = PuzzleRepository(uri=uri, user=user, password=password)
@@ -162,7 +183,8 @@ def run_cli() -> None:
             print("\n=== MENU ROMPECABEZAS (Neo4j) ===")
             print("1. Importar rompecabezas desde TXT")
             print("2. Resolver rompecabezas")
-            print("3. Salir")
+            print("3. Restaurar piezas faltantes a disponible")
+            print("4. Salir")
 
             option = _read_non_empty("Elige una opcion: ")
 
@@ -173,6 +195,9 @@ def run_cli() -> None:
                 _run_solver(repo)
                 continue
             if option == "3":
+                _run_reset(repo)
+                continue
+            if option == "4":
                 print("Saliendo...")
                 return
 

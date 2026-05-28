@@ -1,47 +1,38 @@
-# PRY3-BD2
+# Proyecto 3 — Elección de tecnologías de base de datos
 
-Proyecto de rompecabezas con Neo4j: carga de rompecabezas desde formato TXT estandar y resolucion por BFS con soporte para piezas faltantes.
+Roberto Barreda, 23354
+Javier España, 23361
+Diego López, 23747
+Ángel Esquit, 23221
+Mia Fuentes, 23775
+Anggelie Velásquez, 221181
 
-## Estructura
+---
 
-- `src/puzzle_app/`: codigo principal.
-- `puzzles/`: archivos TXT de rompecabezas.
-- `formato_rompecabezas.txt`: especificacion del formato.
-- `main.py`: punto de entrada unico de la aplicacion.
-- `PENDIENTES_E_INSTRUCCIONES_EQUIPO.md`: checklist de entrega y guia para el equipo.
+## Requisitos
 
-## Configuracion
+- Python 3.10+
+- Cuenta en [Neo4j Aura](https://neo4j.com/cloud/aura/) (Free tier funciona)
 
-Definir variables de entorno para Neo4j (Aura o local):
+## Configuración
 
-- `NEO4J_URI`
-- `NEO4J_USER`
-- `NEO4J_PASSWORD`
+Crea un archivo `.env` en la raíz del proyecto:
 
-Ejemplo:
-
-```bash
-export NEO4J_URI='neo4j+s://<tu-instancia>.databases.neo4j.io'
-export NEO4J_USER='neo4j'
-export NEO4J_PASSWORD='<tu-password>'
+```
+NEO4J_URI=neo4j+s://<instancia>.databases.neo4j.io
+NEO4J_USERNAME=<usuario>
+NEO4J_PASSWORD=<password>
 ```
 
-## Instalar dependencias
+## Instalación y ejecución
 
 ```bash
 pip install -r requirements.txt
-```
-
-## Ejecutar UI
-
-```bash
 python main.py
 ```
 
-Desde la UI puedes:
+## Uso
 
-1. Importar rompecabezas desde un `.txt`.
-2. Elegir uno de los rompecabezas ya cargados.
-3. Elegir pieza inicial.
-4. Marcar piezas faltantes (una o varias).
-5. Obtener instrucciones para armar lo maximo posible.
+1. **Opción 1** — Importar rompecabezas desde un archivo `.txt` (ver `formato_rompecabezas.txt`)
+2. **Opción 2** — Resolver: elegir rompecabezas, pieza inicial y piezas faltantes (se persisten en la BD)
+3. **Opción 3** — Restaurar todas las piezas de un rompecabezas a disponible

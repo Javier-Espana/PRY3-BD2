@@ -1,0 +1,56 @@
+[PUZZLE]
+puzzle_id=puzzle1_plesiosaur
+nombre=Plesiosaur
+marca=Plesiosaurus
+material=Madera
+tematica=Dinosaurios_Marinos
+total_piezas=10
+
+[PIEZAS]
+# Piezas numeradas del 1 al 10 (1=cabeza, 10=cola)
+1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+
+[CONEXIONES]
+# Cadena lineal: pieza i conecta con pieza i+1
+# Pieza 1 (cabeza): solo un lado de conexion (MACHO hacia pieza 2)
+1|0|MACHO
+# Piezas intermedias: HEMBRA hacia la pieza anterior, MACHO hacia la pieza siguiente
+2|0|HEMBRA
+2|1|MACHO
+3|0|HEMBRA
+3|1|MACHO
+4|0|HEMBRA
+4|1|MACHO
+5|0|HEMBRA
+5|1|MACHO
+6|0|HEMBRA
+6|1|MACHO
+7|0|HEMBRA
+7|1|MACHO
+8|0|HEMBRA
+8|1|MACHO
+9|0|HEMBRA
+9|1|MACHO
+# Pieza 10 (cola): solo un lado de conexion (HEMBRA desde pieza 9)
+10|0|HEMBRA
+
+[ENLACES]
+# Cada pieza i (MACHO) enlaza con pieza i+1 (HEMBRA)
+1|0|2|0
+2|1|3|0
+3|1|4|0
+4|1|5|0
+5|1|6|0
+6|1|7|0
+7|1|8|0
+8|1|9|0
+9|1|10|0

@@ -1,3 +1,7 @@
+from dotenv import load_dotenv
+
+load_dotenv()
+
 from src.puzzle_app.cli import run_cli
 
 
